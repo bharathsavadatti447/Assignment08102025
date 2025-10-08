@@ -41,6 +41,14 @@ pipeline {
 
             }
         }
+        stage ('SonarQube Analysis') {
+            steps {
+                withSonarqubeEnv('Sonarqube'){
+                    sh 'chmod 777 sonar-project'
+                    sh 'sonar-project'
+                }
+            }
+        }
     } // End of stages
 
     post {
