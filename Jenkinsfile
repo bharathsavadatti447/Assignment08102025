@@ -1,7 +1,6 @@
 pipeline {
     agent any
-
-    tools {
+       tools {
         maven "Maven"        // Make sure this matches Jenkins configuration
         jdk "Java-21"        // Make sure this matches Jenkins configuration
     }
@@ -46,8 +45,7 @@ pipeline {
             steps {
                 // Make sure SonarQube plugin is installed and configured with this exact name
                 withSonarqubeEnv('Sonar') {
-                    echo "Running SonarQube Analysis..."
-                    sh 'mvn sonar:sonar'
+                    sh 'sonar-scanner'
                 }
             }
         }
