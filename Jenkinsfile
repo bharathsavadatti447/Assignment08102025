@@ -1,15 +1,16 @@
 pipeline {
     agent any
-       tools {
-        maven "Maven"        // Make sure this matches Jenkins configuration
-        jdk "Java-21"        // Make sure this matches Jenkins configuration
+
+    tools {
+        maven "Maven"         // Must match the Maven tool name configured in Jenkins
+        jdk "Java-21"         // Must match the JDK tool name configured in Jenkins
     }
 
     stages {
         stage('Clean Workspace') {
             steps {
                 echo "Cleaning Workspace..."
-                deleteDir()
+                deleteDir()      // Deletes all files in the workspace before checkout
             }
         }
 
@@ -23,7 +24,7 @@ pipeline {
         stage('Build') {
             steps {
                 echo "Compiling Maven project..."
-                sh 'mvn clean package'
+                sh 'mvn clean compile'  // Use 'compile' instead of 'package' for Sonar
             }
         }
 
@@ -34,39 +35,47 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+        stage('SonarQube Analysis') {
             steps {
-                echo "Deploying the Artifact..."
-                // Add deploy steps here if needed
+                echo "Running SonarQube Analysis..."
+                withSonarQubeEnv('Sonar') {   // Name must match your SonarQube server in Jenkins
+                    sh 'mvn sonar:sonar -Dsonar.projectKey=Assignment08102025 -Dsonar.sources=main -Dsonar.java.binaries=target/classes'
+                }
             }
         }
 
-        stage('SonarQube Analysis') {
+        stage('Quality Gate') {
             steps {
-                // Make sure SonarQube plugin is installed and configured with this exact name
-                withSonarqubeEnv('Sonar') {
-                    sh 'mvn sonar:sonar'
+                timeout(time: 1, unit: 'HOURS') {
+                    waitForQualityGate abortPipeline: true
                 }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo "Deploying the Artifact..."
+                archiveArtifacts artifacts: 'target/*.jar', onlyIfSuccessful: true
+                // Add actual deployment commands here if needed
             }
         }
     }
 
     post {
         success {
-            echo "✔️BUILD AND TEST STAGE SUCCESSFUL!"
+            echo "✔️ BUILD AND TEST STAGES SUCCESSFUL!"
             junit allowEmptyResults: true, testResults: '**/target/surefire-reports/TEST-*.xml'
-            archiveArtifacts artifacts: 'target/*.jar', onlyIfSuccessful: true
         }
 
         failure {
-            echo "❌BUILD FAILED!"
+            echo "❌ BUILD FAILED!"
             mail to: 'bharath.savadatti447@gmail.com',
                  subject: "Failed: ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}",
-                 body: "Job '${env.JOB_NAME}' (${env.BUILD_URL}) failed"
+                 body: "Job '${env.JOB_NAME}' (${env.BUILD_URL}) failed. Please check Jenkins logs."
         }
 
         always {
-            echo "🔸BUILD EXECUTION COMPLETED🔸"
+            echo "🔸 BUILD EXECUTION COMPLETED 🔸"
         }
     }
 }
