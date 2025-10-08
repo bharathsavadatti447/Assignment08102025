@@ -53,8 +53,6 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo "Deploying the Artifact..."
-                archiveArtifacts artifacts: 'target/*.jar', onlyIfSuccessful: true
-                // Add actual deployment commands here if needed
             }
         }
     }
@@ -63,6 +61,7 @@ pipeline {
         success {
             echo "✔️ BUILD AND TEST STAGES SUCCESSFUL!"
             junit allowEmptyResults: true, testResults: '**/target/surefire-reports/TEST-*.xml'
+            archiveArtifacts artifacts: 'target/*.jar', onlyIfSuccessful: true
         }
 
         failure {
