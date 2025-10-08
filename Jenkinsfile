@@ -34,17 +34,14 @@ pipeline {
                 sh 'mvn test'
             }
         }
-
         stage('SonarQube Analysis') {
             steps {
                 echo "Running SonarQube Analysis..."
-                withSonarQubeEnv('Sonar') {   // Name must match your SonarQube server in Jenkins
-                    // Change 'app' to your actual source folder
-                    sh 'mvn sonar:sonar -Dsonar.projectKey=Assignment08102025 -Dsonar.sources=. -Dsonar.java.binaries=target/classes'
+                withSonarQubeEnv('Sonar') {
+                    sh 'mvn sonar:sonar -Dsonar.projectKey=Assignment08102025 -Dsonar.sources=dev.java'
                 }
             }
         }
-
         stage('Quality Gate') {
             steps {
                 timeout(time: 1, unit: 'HOURS') {
