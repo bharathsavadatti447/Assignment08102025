@@ -10,7 +10,7 @@
     <packaging>jar</packaging>
 
     <name>DevOpsCloudQuiz</name>
-    <description>GUI-based DevOps & Cloud Engineer Interview Quiz Application</description>
+    <description>GUI-based DevOps &amp; Cloud Engineer Interview Quiz Application</description>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>  <!-- use your JDK version -->
