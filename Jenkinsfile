@@ -45,7 +45,7 @@ pipeline {
             steps {
                 // Make sure SonarQube plugin is installed and configured with this exact name
                 withSonarqubeEnv('Sonar') {
-                    sh 'sonar-scanner'
+                    sh 'mvn sonar:sonar'
                 }
             }
         }
