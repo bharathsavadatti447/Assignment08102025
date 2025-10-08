@@ -39,7 +39,8 @@ pipeline {
             steps {
                 echo "Running SonarQube Analysis..."
                 withSonarQubeEnv('Sonar') {   // Name must match your SonarQube server in Jenkins
-                    sh 'mvn sonar:sonar -Dsonar.projectKey=Assignment08102025 -Dsonar.sources=main -Dsonar.java.binaries=target/classes'
+                    // Change 'app' to your actual source folder
+                    sh 'mvn sonar:sonar -Dsonar.projectKey=Assignment08102025 -Dsonar.sources=app -Dsonar.java.binaries=target/classes'
                 }
             }
         }
