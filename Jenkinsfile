@@ -2,14 +2,14 @@ pipeline {
     agent any
 
     tools {
-        maven "Maven"
-        jdk "Java-21"
+        maven "Maven"        // Make sure this matches Jenkins configuration
+        jdk "Java-21"        // Make sure this matches Jenkins configuration
     }
 
     stages {
         stage('Clean Workspace') {
             steps {
-                echo "Cleaning Workspace......"
+                echo "Cleaning Workspace..."
                 deleteDir()
             }
         }
@@ -17,7 +17,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 git branch: "main",
-                url: 'https://github.com/bharathsavadatti447/Assignment08102025.git'
+                    url: 'https://github.com/bharathsavadatti447/Assignment08102025.git'
             }
         }
 
@@ -33,41 +33,42 @@ pipeline {
                 echo "Running Maven tests..."
                 sh 'mvn test'
             }
-        }    
+        }
 
         stage('Deploy') {
             steps {
-                echo "Deploy the Artifact..."
-
+                echo "Deploying the Artifact..."
+                // Add deploy steps here if needed
             }
         }
-        stage ('SonarQube Analysis') {
+
+        stage('SonarQube Analysis') {
             steps {
-                withSonarqubeEnv('Sonarqube'){
-                    sh 'chmod 777 sonar-project'
-                    sh 'sonar-project'
+                // Make sure SonarQube plugin is installed and configured with this exact name
+                withSonarqubeEnv('Sonar') {
+                    echo "Running SonarQube Analysis..."
+                    sh 'mvn sonar:sonar'
                 }
             }
         }
-    } // End of stages
+    }
 
     post {
         success {
-            echo "✔️BUILD AND TEST STAGE SUCCESSFUL...!!!"
-            // Updated: allow empty results to prevent failure if no tests
+            echo "✔️BUILD AND TEST STAGE SUCCESSFUL!"
             junit allowEmptyResults: true, testResults: '**/target/surefire-reports/TEST-*.xml'
             archiveArtifacts artifacts: 'target/*.jar', onlyIfSuccessful: true
         }
 
         failure {
-            echo "❌Failure..!!!"
+            echo "❌BUILD FAILED!"
             mail to: 'bharath.savadatti447@gmail.com',
                  subject: "Failed: ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}",
                  body: "Job '${env.JOB_NAME}' (${env.BUILD_URL}) failed"
         }
 
         always {
-            echo "🔸🔸🔸You are executed the build🔸🔸🔸!!!"
+            echo "🔸BUILD EXECUTION COMPLETED🔸"
         }
     }
 }
