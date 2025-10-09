@@ -24,7 +24,7 @@ pipeline {
         stage('Build') {
             steps {
                 echo "Compiling Maven project..."
-                sh 'mvn clean compile'  // Use 'compile' instead of 'package' for Sonar
+                sh 'mvn clean package'  // Use 'compile' instead of 'package' for Sonar
             }
         }
 
